@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Search, DollarSign, TrendingUp, TrendingDown, User } from 'lucide-react';
+import { Search, DollarSign, TrendingUp, TrendingDown, User, Plus } from 'lucide-react';
+import Header from '@/components/Header';
 
 const ParticularDetailsPage = () => {
   const { id } = useParams();
@@ -34,106 +35,89 @@ const ParticularDetailsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" onClick={() => navigate('/particulars')}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Particulars
-              </Button>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {particular?.name || 'Particular Details'}
-              </h1>
-            </div>
-            <Button onClick={() => navigate(`/particulars/${id}/transactions/new`)}>
-              Add Transaction
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header 
+        title={particular?.name || 'Particular Details'}
+        showBackButton={true}
+        backTo="/particulars"
+        rightAction={{
+          label: "Add Transaction",
+          onClick: () => navigate(`/particulars/${id}/transactions/new`),
+          icon: <Plus className="h-4 w-4" />
+        }}
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="space-y-6">
+          <TabsContent value="overview" className="space-y-4 sm:space-y-6">
             {/* Particular Overview Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Incoming</CardTitle>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+              <Card className="p-3 sm:p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Incoming</span>
                   <TrendingUp className="h-4 w-4 text-green-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">₹{particular?.totalIncoming?.toLocaleString() || '0'}</div>
-                  <p className="text-xs text-muted-foreground">Total incoming transactions</p>
-                </CardContent>
+                </div>
+                <div className="text-lg sm:text-2xl font-bold">₹{particular?.totalIncoming?.toLocaleString() || '0'}</div>
+                <p className="text-xs text-muted-foreground hidden sm:block">Total incoming transactions</p>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Outgoing</CardTitle>
+              <Card className="p-3 sm:p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Outgoing</span>
                   <TrendingDown className="h-4 w-4 text-red-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">₹{particular?.totalOutgoing?.toLocaleString() || '0'}</div>
-                  <p className="text-xs text-muted-foreground">Total outgoing transactions</p>
-                </CardContent>
+                </div>
+                <div className="text-lg sm:text-2xl font-bold">₹{particular?.totalOutgoing?.toLocaleString() || '0'}</div>
+                <p className="text-xs text-muted-foreground hidden sm:block">Total outgoing transactions</p>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
+              <Card className="p-3 sm:p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Assets</span>
                   <DollarSign className="h-4 w-4 text-blue-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">₹{particular?.totalAssets?.toLocaleString() || '0'}</div>
-                  <p className="text-xs text-muted-foreground">Metal assets value</p>
-                </CardContent>
+                </div>
+                <div className="text-lg sm:text-2xl font-bold">₹{particular?.totalAssets?.toLocaleString() || '0'}</div>
+                <p className="text-xs text-muted-foreground hidden sm:block">Metal assets value</p>
               </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Cash</CardTitle>
+              <Card className="p-3 sm:p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Cash</span>
                   <User className="h-4 w-4 text-purple-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">₹{particular?.totalCash?.toLocaleString() || '0'}</div>
-                  <p className="text-xs text-muted-foreground">Cash balance</p>
-                </CardContent>
+                </div>
+                <div className="text-lg sm:text-2xl font-bold">₹{particular?.totalCash?.toLocaleString() || '0'}</div>
+                <p className="text-xs text-muted-foreground hidden sm:block">Cash balance</p>
               </Card>
             </div>
 
             {/* Particular Details */}
             <Card>
-              <CardHeader>
-                <CardTitle>Client Information</CardTitle>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-lg sm:text-xl">Client Information</CardTitle>
               </CardHeader>
               {particularLoading ? (
                 <div className="text-center py-8">Loading particular details...</div>
               ) : (
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="font-medium mb-2">Name</h3>
-                    <p className="text-gray-600">{particular?.name}</p>
+              <CardContent className="pt-0 sm:pt-6">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="font-medium text-gray-700">Name</span>
+                    <span className="text-gray-900">{particular?.name}</span>
                   </div>
-                  <div>
-                    <h3 className="font-medium mb-2">Contact Number</h3>
-                    <p className="text-gray-600">{particular?.contactNumber}</p>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="font-medium text-gray-700">Contact Number</span>
+                    <span className="text-gray-900">{particular?.contactNumber}</span>
                   </div>
-                  <div>
-                    <h3 className="font-medium mb-2">Address</h3>
-                    <p className="text-gray-600">{particular?.address}</p>
+                  <div className="py-2 border-b border-gray-100">
+                    <span className="font-medium text-gray-700 block mb-1">Address</span>
+                    <span className="text-gray-900">{particular?.address}</span>
                   </div>
-                  <div>
-                    <h3 className="font-medium mb-2">Identity Document</h3>
-                    <p className="text-gray-600">{particular?.identityDocument}</p>
+                  <div className="py-2">
+                    <span className="font-medium text-gray-700 block mb-1">Identity Document</span>
+                    <span className="text-gray-900">{particular?.identityDocument}</span>
                   </div>
                 </div>
               </CardContent>
@@ -141,26 +125,26 @@ const ParticularDetailsPage = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="transactions" className="space-y-6">
+          <TabsContent value="transactions" className="space-y-4 sm:space-y-6">
             {/* Search and Filters */}
             <Card>
-              <CardHeader>
-                <CardTitle>Search & Filter Transactions</CardTitle>
-                <CardDescription>Find specific transactions for this client</CardDescription>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-lg sm:text-xl">Search & Filter Transactions</CardTitle>
+                <CardDescription className="hidden sm:block">Find specific transactions for this client</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <CardContent className="pt-0 sm:pt-6">
+                <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
+                  <div className="relative sm:col-span-2 lg:col-span-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                       placeholder="Search transactions..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 h-12 sm:h-10"
                     />
                   </div>
                   <Select value={transactionType} onValueChange={setTransactionType}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 sm:h-10">
                       <SelectValue placeholder="Transaction Type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -170,7 +154,7 @@ const ParticularDetailsPage = () => {
                     </SelectContent>
                   </Select>
                   <Select value={transactionFlow} onValueChange={setTransactionFlow}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 sm:h-10">
                       <SelectValue placeholder="Transaction Flow" />
                     </SelectTrigger>
                     <SelectContent>
@@ -186,6 +170,7 @@ const ParticularDetailsPage = () => {
                       setTransactionType('all');
                       setTransactionFlow('all');
                     }}
+                    className="h-12 sm:h-10 sm:col-span-2 lg:col-span-1"
                   >
                     Clear Filters
                   </Button>
@@ -195,52 +180,95 @@ const ParticularDetailsPage = () => {
 
             {/* Transactions Table */}
             <Card>
-              <CardHeader>
-                <CardTitle>Transaction History</CardTitle>
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-lg sm:text-xl">Transaction History</CardTitle>
                 <CardDescription>
                   Showing {filteredTransactions.length} of {transactions.length} transactions
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0 sm:pt-6">
                 {isLoading ? (
                   <div className="text-center py-8">Loading transactions...</div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Flow</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Rate</TableHead>
-                        <TableHead>Total</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
+                  <>
+                    {/* Mobile List View */}
+                    <div className="space-y-3 sm:hidden">
                       {filteredTransactions.map((transaction: any) => (
-                        <TableRow key={transaction._id}>
-                          <TableCell>
-                            {new Date(transaction.createdAt).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell className="capitalize">{transaction.transactionType}</TableCell>
-                          <TableCell>
-                            <span className={`px-2 py-1 rounded-full text-xs ${
-                              transaction.transactionFlow === 'incoming' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {transaction.transactionFlow}
-                            </span>
-                          </TableCell>
-                          <TableCell>{transaction.description}</TableCell>
-                          <TableCell>{transaction.quantity}</TableCell>
-                          <TableCell>₹{transaction.rate?.toLocaleString()}</TableCell>
-                          <TableCell className="font-medium">₹{transaction.total?.toLocaleString()}</TableCell>
-                        </TableRow>
+                        <div 
+                          key={transaction._id}
+                          className="bg-white border rounded-lg p-4 space-y-2"
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <span className="text-sm font-medium text-gray-900">
+                                  {new Date(transaction.createdAt).toLocaleDateString()}
+                                </span>
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  transaction.transactionFlow === 'incoming' 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {transaction.transactionFlow}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600">{transaction.description}</p>
+                              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>Type: {transaction.transactionType}</span>
+                                <span>Qty: {transaction.quantity}</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-semibold text-gray-900">₹{transaction.total?.toLocaleString()}</div>
+                              <div className="text-xs text-gray-500">Rate: ₹{transaction.rate?.toLocaleString()}</div>
+                            </div>
+                          </div>
+                        </div>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className="hidden sm:block overflow-x-auto">
+                      <div className="min-w-full">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="min-w-[100px]">Date</TableHead>
+                              <TableHead className="min-w-[80px]">Type</TableHead>
+                              <TableHead className="min-w-[100px]">Flow</TableHead>
+                              <TableHead className="min-w-[150px] hidden md:table-cell">Description</TableHead>
+                              <TableHead className="min-w-[80px]">Quantity</TableHead>
+                              <TableHead className="min-w-[100px] hidden md:table-cell">Rate</TableHead>
+                              <TableHead className="min-w-[100px]">Total</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {filteredTransactions.map((transaction: any) => (
+                              <TableRow key={transaction._id}>
+                                <TableCell>
+                                  {new Date(transaction.createdAt).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell className="capitalize">{transaction.transactionType}</TableCell>
+                                <TableCell>
+                                  <span className={`px-2 py-1 rounded-full text-xs ${
+                                    transaction.transactionFlow === 'incoming' 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {transaction.transactionFlow}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="hidden md:table-cell">{transaction.description}</TableCell>
+                                <TableCell>{transaction.quantity}</TableCell>
+                                <TableCell className="hidden md:table-cell">₹{transaction.rate?.toLocaleString()}</TableCell>
+                                <TableCell className="font-medium">₹{transaction.total?.toLocaleString()}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </div>
+                  </>
                 )}
                 {filteredTransactions.length === 0 && (
                   <div className="text-center py-8 text-gray-500">No transactions found</div>

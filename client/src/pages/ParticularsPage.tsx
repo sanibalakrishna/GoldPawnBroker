@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Plus, ArrowLeft } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
+import Header from '@/components/Header';
 
 const ParticularsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,40 +19,32 @@ const ParticularsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" onClick={() => navigate('/')}>
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-              <h1 className="text-2xl font-bold text-gray-900">Particulars</h1>
-            </div>
-            <Button onClick={() => navigate('/particulars/new')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add New Particular
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header 
+        title="Particulars"
+        showBackButton={true}
+        backTo="/"
+        rightAction={{
+          label: "Add New Particular",
+          onClick: () => navigate('/particulars/new'),
+          icon: <Plus className="h-4 w-4" />
+        }}
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Search and Filters */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Search & Filter</CardTitle>
-            <CardDescription>Find specific clients by name or contact number</CardDescription>
+        <Card className="mb-6 sm:mb-8">
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">Search & Filter</CardTitle>
+            <CardDescription className="hidden sm:block">Find specific clients by name or contact number</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0 sm:pt-6">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search by name or contact number..."
+                placeholder="Search clients..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-12 sm:h-10"
               />
             </div>
           </CardContent>
@@ -59,53 +52,85 @@ const ParticularsPage = () => {
 
         {/* Particulars Table */}
         <Card>
-          <CardHeader>
-            <CardTitle>All Particulars</CardTitle>
+          <CardHeader className="pb-3 sm:pb-6">
+            <CardTitle className="text-lg sm:text-xl">All Particulars</CardTitle>
             <CardDescription>
               Showing {particulars.length} of {pagination?.total || 0} clients
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0 sm:pt-6">
             {isLoading ? (
               <div className="text-center py-8">Loading particulars...</div>
             ) : (
               <>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Contact</TableHead>
-                      <TableHead>Address</TableHead>
-                      <TableHead>Total Assets</TableHead>
-                      <TableHead>Total Cash</TableHead>
-                      <TableHead>Net Position</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {particulars.map((particular: any) => (
-                      <TableRow key={particular._id || particular.id}>
-                        <TableCell className="font-medium">{particular.name}</TableCell>
-                        <TableCell>{particular.contactNumber}</TableCell>
-                        <TableCell className="max-w-xs truncate">{particular.address}</TableCell>
-                        <TableCell>₹{particular.totalAssets?.toLocaleString()}</TableCell>
-                        <TableCell>₹{particular.totalCash?.toLocaleString()}</TableCell>
-                        <TableCell className={particular.netPosition >= 0 ? 'text-green-600' : 'text-red-600'}>
-                          ₹{particular.netPosition?.toLocaleString()}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate(`/particulars/${particular._id || particular.id}`)}
-                          >
-                            View Details
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                {/* Mobile List View */}
+                <div className="space-y-3 sm:hidden">
+                  {particulars.map((particular: any) => (
+                    <div 
+                      key={particular._id || particular.id}
+                      className="bg-white border rounded-lg p-4 space-y-2"
+                      onClick={() => navigate(`/particulars/${particular._id || particular.id}`)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900">{particular.name}</h3>
+                          <p className="text-sm text-gray-600">{particular.contactNumber}</p>
+                          <p className="text-xs text-gray-500 mt-1 truncate">{particular.address}</p>
+                        </div>
+                        <div className={`text-right ${particular.netPosition >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          <div className="font-semibold">₹{particular.netPosition?.toLocaleString()}</div>
+                          <div className="text-xs text-gray-500">Net Position</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>Assets: ₹{particular.totalAssets?.toLocaleString()}</span>
+                        <span>Cash: ₹{particular.totalCash?.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <div className="min-w-full">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="min-w-[120px]">Name</TableHead>
+                          <TableHead className="min-w-[120px]">Contact</TableHead>
+                          <TableHead className="min-w-[150px] hidden md:table-cell">Address</TableHead>
+                          <TableHead className="min-w-[100px]">Total Assets</TableHead>
+                          <TableHead className="min-w-[100px]">Total Cash</TableHead>
+                          <TableHead className="min-w-[100px]">Net Position</TableHead>
+                          <TableHead className="min-w-[100px]">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {particulars.map((particular: any) => (
+                          <TableRow key={particular._id || particular.id}>
+                            <TableCell className="font-medium">{particular.name}</TableCell>
+                            <TableCell>{particular.contactNumber}</TableCell>
+                            <TableCell className="max-w-xs truncate hidden md:table-cell">{particular.address}</TableCell>
+                            <TableCell>₹{particular.totalAssets?.toLocaleString()}</TableCell>
+                            <TableCell>₹{particular.totalCash?.toLocaleString()}</TableCell>
+                            <TableCell className={particular.netPosition >= 0 ? 'text-green-600' : 'text-red-600'}>
+                              ₹{particular.netPosition?.toLocaleString()}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => navigate(`/particulars/${particular._id || particular.id}`)}
+                              >
+                                View Details
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
 
                 {particulars.length === 0 && (
                   <div className="text-center py-8 text-gray-500">No particulars found</div>
@@ -113,7 +138,7 @@ const ParticularsPage = () => {
 
                 {/* Pagination */}
                 {pagination && pagination.pages > 1 && (
-                  <div className="flex items-center justify-between mt-6">
+                  <div className="flex flex-col sm:flex-row items-center justify-between mt-6 space-y-4 sm:space-y-0">
                     <div className="text-sm text-gray-700">
                       Showing page {pagination.page} of {pagination.pages}
                     </div>
