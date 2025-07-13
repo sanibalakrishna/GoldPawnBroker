@@ -28,19 +28,22 @@ app.use(express.urlencoded({ extended: true }));
 // MongoDB Connection with proper configuration
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gold_pawn_broker';
 
-mongoose.connect(MONGODB_URI, {
-  maxPoolSize: 10,
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-  bufferCommands: false,
-  retryWrites: true,
-  w: 'majority'
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => {
-  console.error('MongoDB connection error:', err);
-  process.exit(1);
-});
+// Initialize MongoDB connection
+async function connectDB() {
+  try {
+    await mongoose.connect(MONGODB_URI, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      retryWrites: true,
+      w: 'majority'
+    });
+    console.log('Connected to MongoDB');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  }
+}
 
 // Handle MongoDB connection events
 mongoose.connection.on('error', (err) => {
@@ -79,9 +82,19 @@ app.use('*path', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+// Start server after database connection
+async function startServer() {
+  await connectDB();
+  
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+  });
+}
+
+startServer().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });
 
 export default app;
