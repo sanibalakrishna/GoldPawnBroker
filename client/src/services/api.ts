@@ -45,6 +45,25 @@ export const api = createApi({
       }),
       invalidatesTags: ['Particular'],
     }),
+    updateParticular: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/particulars/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['Particular'],
+    }),
+    deleteParticular: builder.mutation({
+      query: (id) => ({
+        url: `/particulars/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Particular'],
+    }),
+    getTransaction: builder.query({
+      query: (id) => `/transactions/${id}`,
+      providesTags: ['Transaction'],
+    }),
     getTransactions: builder.query({
       query: (id) => `/transactions/particular/${id}`,
       providesTags: ['Transaction'],
@@ -57,6 +76,21 @@ export const api = createApi({
       }),
       invalidatesTags: ['Transaction'],
     }),
+    updateTransaction: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/transactions/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['Transaction'],
+    }),
+    deleteTransaction: builder.mutation({
+      query: (id) => ({
+        url: `/transactions/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Transaction'],
+    }),
   }),
 });
 
@@ -66,6 +100,11 @@ export const {
   useGetParticularsQuery,
   useGetParticularQuery,
   useCreateParticularMutation,
+  useUpdateParticularMutation,
+  useDeleteParticularMutation,
+  useGetTransactionQuery,
   useGetTransactionsQuery,
   useCreateTransactionMutation,
+  useUpdateTransactionMutation,
+  useDeleteTransactionMutation,
 } = api;

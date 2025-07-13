@@ -1,21 +1,51 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetParticularsQuery } from '@/services/api';
+import { useGetParticularsQuery, useDeleteParticularMutation } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, MoreHorizontal } from 'lucide-react';
+import { toast } from 'sonner';
 import Header from '@/components/Header';
+import DeleteConfirmDialog from '@/components/DeleteConfirmDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ParticularsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedParticular, setSelectedParticular] = useState<any>(null);
+  
   const { data, isLoading } = useGetParticularsQuery({ search: searchTerm, page: currentPage });
+  const [deleteParticular, { isLoading: deleting }] = useDeleteParticularMutation();
   const navigate = useNavigate();
 
   const particulars = data?.particulars || [];
   const pagination = data?.pagination;
+
+  const handleDelete = async () => {
+    if (!selectedParticular) return;
+    
+    try {
+      await deleteParticular(selectedParticular._id || selectedParticular.id).unwrap();
+      toast.success('Particular deleted successfully!');
+      setDeleteDialogOpen(false);
+      setSelectedParticular(null);
+    } catch (error: any) {
+      toast.error(error.data?.error || 'Failed to delete particular');
+    }
+  };
+
+  const openDeleteDialog = (particular: any) => {
+    setSelectedParticular(particular);
+    setDeleteDialogOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,17 +99,45 @@ const ParticularsPage = () => {
                     <div 
                       key={particular._id || particular.id}
                       className="bg-white border rounded-lg p-4 space-y-2"
-                      onClick={() => navigate(`/particulars/${particular._id || particular.id}`)}
                     >
                       <div className="flex justify-between items-start">
-                        <div className="flex-1">
+                        <div 
+                          className="flex-1 cursor-pointer"
+                          onClick={() => navigate(`/particulars/${particular._id || particular.id}`)}
+                        >
                           <h3 className="font-semibold text-gray-900">{particular.name}</h3>
                           <p className="text-sm text-gray-600">{particular.contactNumber}</p>
                           <p className="text-xs text-gray-500 mt-1 truncate">{particular.address}</p>
                         </div>
-                        <div className={`text-right ${particular.netPosition >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          <div className="font-semibold">₹{particular.netPosition?.toLocaleString()}</div>
-                          <div className="text-xs text-gray-500">Net Position</div>
+                        <div className="flex items-center space-x-2">
+                          <div className={`text-right ${particular.netPosition >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            <div className="font-semibold">₹{particular.netPosition?.toLocaleString()}</div>
+                            <div className="text-xs text-gray-500">Net Position</div>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => navigate(`/particulars/${particular._id || particular.id}`)}>
+                                <Edit className="h-4 w-4 mr-2" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => navigate(`/particulars/${particular._id || particular.id}/edit`)}>
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => openDeleteDialog(particular)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500">
@@ -117,13 +175,35 @@ const ParticularsPage = () => {
                               ₹{particular.netPosition?.toLocaleString()}
                             </TableCell>
                             <TableCell>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => navigate(`/particulars/${particular._id || particular.id}`)}
-                              >
-                                View Details
-                              </Button>
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => navigate(`/particulars/${particular._id || particular.id}`)}
+                                >
+                                  View
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => navigate(`/particulars/${particular._id || particular.id}/edit`)}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={() => openDeleteDialog(particular)}
+                                      className="text-red-600"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -167,6 +247,15 @@ const ParticularsPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      <DeleteConfirmDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Particular"
+        description={`Are you sure you want to delete "${selectedParticular?.name}"? This action cannot be undone and will also delete all associated transactions.`}
+        isLoading={deleting}
+      />
     </div>
   );
 };

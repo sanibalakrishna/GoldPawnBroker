@@ -1,14 +1,22 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetParticularQuery, useGetTransactionsQuery } from '@/services/api';
+import { useGetParticularQuery, useGetTransactionsQuery, useDeleteTransactionMutation } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, DollarSign, TrendingUp, TrendingDown, User, Plus } from 'lucide-react';
+import { Search, DollarSign, TrendingUp, TrendingDown, User, Plus, Edit, Trash2, MoreHorizontal } from 'lucide-react';
+import { toast } from 'sonner';
 import Header from '@/components/Header';
+import DeleteConfirmDialog from '@/components/DeleteConfirmDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const ParticularDetailsPage = () => {
   const { id } = useParams();
@@ -16,12 +24,33 @@ const ParticularDetailsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [transactionType, setTransactionType] = useState('all');
   const [transactionFlow, setTransactionFlow] = useState('all');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   
   const { data: transactionsData, isLoading } = useGetTransactionsQuery(id!);
   const {data:particularData,isLoading:particularLoading} = useGetParticularQuery(id!);
+  const [deleteTransaction, { isLoading: deleting }] = useDeleteTransactionMutation();
   
   const transactions = transactionsData?.transactions || [];
   const particular = particularData;
+
+  const handleDeleteTransaction = async () => {
+    if (!selectedTransaction) return;
+    
+    try {
+      await deleteTransaction(selectedTransaction._id).unwrap();
+      toast.success('Transaction deleted successfully!');
+      setDeleteDialogOpen(false);
+      setSelectedTransaction(null);
+    } catch (error: any) {
+      toast.error(error.data?.error || 'Failed to delete transaction');
+    }
+  };
+
+  const openDeleteDialog = (transaction: any) => {
+    setSelectedTransaction(transaction);
+    setDeleteDialogOpen(true);
+  };
 
   // Filter transactions based on search and filters
   const filteredTransactions = transactions.filter((transaction: any) => {
@@ -218,9 +247,31 @@ const ParticularDetailsPage = () => {
                                 <span>Qty: {transaction.quantity}</span>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="font-semibold text-gray-900">₹{transaction.total?.toLocaleString()}</div>
-                              <div className="text-xs text-gray-500">Rate: ₹{transaction.rate?.toLocaleString()}</div>
+                            <div className="flex items-center space-x-2">
+                              <div className="text-right">
+                                <div className="font-semibold text-gray-900">₹{transaction.total?.toLocaleString()}</div>
+                                <div className="text-xs text-gray-500">Rate: ₹{transaction.rate?.toLocaleString()}</div>
+                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => navigate(`/particulars/${id}/transactions/${transaction._id}/edit`)}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => openDeleteDialog(transaction)}
+                                    className="text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </div>
                         </div>
@@ -240,6 +291,7 @@ const ParticularDetailsPage = () => {
                               <TableHead className="min-w-[80px]">Quantity</TableHead>
                               <TableHead className="min-w-[100px] hidden md:table-cell">Rate</TableHead>
                               <TableHead className="min-w-[100px]">Total</TableHead>
+                              <TableHead className="min-w-[100px]">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -262,6 +314,28 @@ const ParticularDetailsPage = () => {
                                 <TableCell>{transaction.quantity}</TableCell>
                                 <TableCell className="hidden md:table-cell">₹{transaction.rate?.toLocaleString()}</TableCell>
                                 <TableCell className="font-medium">₹{transaction.total?.toLocaleString()}</TableCell>
+                                <TableCell>
+                                  <div className="flex items-center space-x-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => navigate(`/particulars/${id}/transactions/${transaction._id}/edit`)}
+                                      className="h-8 px-2"
+                                    >
+                                      <Edit className="h-3 w-3 mr-1" />
+                                      Edit
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => openDeleteDialog(transaction)}
+                                      className="h-8 px-2 text-red-600 hover:text-red-700"
+                                    >
+                                      <Trash2 className="h-3 w-3 mr-1" />
+                                      Delete
+                                    </Button>
+                                  </div>
+                                </TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
@@ -278,6 +352,15 @@ const ParticularDetailsPage = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <DeleteConfirmDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteTransaction}
+        title="Delete Transaction"
+        description={`Are you sure you want to delete this transaction? This action cannot be undone.`}
+        isLoading={deleting}
+      />
     </div>
   );
 };
