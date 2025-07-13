@@ -26,6 +26,10 @@ export const api = createApi({
       query: ({ search = '', page = 1 }) => `/particulars?search=${search}&page=${page}`,
       providesTags: ['Particular'],
     }),
+    getParticular: builder.query({
+      query: (id) => `/particulars/${id}`,
+      providesTags: ['Particular'],
+    }),
     createParticular: builder.mutation({
       query: (data) => ({
         url: '/particulars',
@@ -53,6 +57,7 @@ export const {
   useLoginMutation,
   useGetDashboardQuery,
   useGetParticularsQuery,
+  useGetParticularQuery,
   useCreateParticularMutation,
   useGetTransactionsQuery,
   useCreateTransactionMutation,

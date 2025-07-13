@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useGetTransactionsQuery } from '@/services/api';
+import { useGetParticularQuery, useGetTransactionsQuery } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,20 +13,21 @@ const ParticularDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [transactionType, setTransactionType] = useState('');
-  const [transactionFlow, setTransactionFlow] = useState('');
+  const [transactionType, setTransactionType] = useState('all');
+  const [transactionFlow, setTransactionFlow] = useState('all');
   
   const { data: transactionsData, isLoading } = useGetTransactionsQuery(id!);
+  const {data:particularData,isLoading:particularLoading} = useGetParticularQuery(id!);
   
   const transactions = transactionsData?.transactions || [];
-  const particular = transactionsData?.particular;
+  const particular = particularData;
 
   // Filter transactions based on search and filters
   const filteredTransactions = transactions.filter((transaction: any) => {
     const matchesSearch = !searchTerm || 
       transaction.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !transactionType || transaction.transactionType === transactionType;
-    const matchesFlow = !transactionFlow || transaction.transactionFlow === transactionFlow;
+    const matchesType = !transactionType || transactionType === 'all' || transaction.transactionType === transactionType;
+    const matchesFlow = !transactionFlow || transactionFlow === 'all' || transaction.transactionFlow === transactionFlow;
     
     return matchesSearch && matchesType && matchesFlow;
   });
@@ -113,6 +114,9 @@ const ParticularDetailsPage = () => {
               <CardHeader>
                 <CardTitle>Client Information</CardTitle>
               </CardHeader>
+              {particularLoading ? (
+                <div className="text-center py-8">Loading particular details...</div>
+              ) : (
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -133,6 +137,7 @@ const ParticularDetailsPage = () => {
                   </div>
                 </div>
               </CardContent>
+              )}
             </Card>
           </TabsContent>
 
@@ -159,7 +164,7 @@ const ParticularDetailsPage = () => {
                       <SelectValue placeholder="Transaction Type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Types</SelectItem>
+                      <SelectItem value="all">All Types</SelectItem>
                       <SelectItem value="cash">Cash</SelectItem>
                       <SelectItem value="metal">Metal</SelectItem>
                     </SelectContent>
@@ -169,7 +174,7 @@ const ParticularDetailsPage = () => {
                       <SelectValue placeholder="Transaction Flow" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Flows</SelectItem>
+                      <SelectItem value="all">All Flows</SelectItem>
                       <SelectItem value="incoming">Incoming</SelectItem>
                       <SelectItem value="outgoing">Outgoing</SelectItem>
                     </SelectContent>
@@ -178,8 +183,8 @@ const ParticularDetailsPage = () => {
                     variant="outline" 
                     onClick={() => {
                       setSearchTerm('');
-                      setTransactionType('');
-                      setTransactionFlow('');
+                      setTransactionType('all');
+                      setTransactionFlow('all');
                     }}
                   >
                     Clear Filters
