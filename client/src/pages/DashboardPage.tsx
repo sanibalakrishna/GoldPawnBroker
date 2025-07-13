@@ -9,7 +9,7 @@ import { Search, Users, DollarSign, TrendingUp, TrendingDown } from 'lucide-reac
 
 const DashboardPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { data: dashboardData, isLoading: dashboardLoading } = useGetDashboardQuery(undefined);
+  const { data: dashboardData } = useGetDashboardQuery(undefined);
   const { data: particularsData, isLoading: particularsLoading } = useGetParticularsQuery({ search: searchTerm, page: 1 });
   const navigate = useNavigate();
 
