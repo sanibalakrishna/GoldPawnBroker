@@ -1,5 +1,5 @@
 // server.ts
-import express, { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoose, { Error } from 'mongoose';
@@ -32,7 +32,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gold_p
 async function connectDB() {
   try {
     await mongoose.connect(MONGODB_URI, {
-      maxPoolSize: 10,
+      maxPoolSize: 10 as any,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       retryWrites: true,
@@ -70,7 +70,7 @@ app.use('/api/transactions', authenticateToken, transactionRoutes);
 app.use('/api/dashboard', authenticateToken, dashboardRoutes);
 
 // // Health Check
-app.get('/health', (req, res) => {
+app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
@@ -78,7 +78,7 @@ app.get('/health', (req, res) => {
 app.use(errorHandler);
 
 // 404 Handler
-app.use('*path', (req, res) => {
+app.use('*path', (req: Request, res: Response) => {
   res.status(404).json({ error: 'Route not found' });
 });
 

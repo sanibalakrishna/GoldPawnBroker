@@ -1,5 +1,5 @@
 // routes/transactions.ts
-import express, { Router } from 'express';
+import express, { Router, Request, Response, NextFunction } from 'express';
 import { ITransaction, Transaction } from '../models/Transaction';
 import { IParticular, Particular } from '../models/Particular';
 import { AuthRequest } from '../middleware/auth';
@@ -44,7 +44,7 @@ const router:Router= express.Router();
  *       200:
  *         description: List of transactions
  */
-router.get('/particular/:particularId', async (req: AuthRequest, res, next) => {
+router.get('/particular/:particularId', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { particularId } = req.params;
     const { transactionType, transactionFlow, page = 1, limit = 10 } = req.query;
@@ -136,7 +136,7 @@ router.get('/particular/:particularId', async (req: AuthRequest, res, next) => {
  *       201:
  *         description: Transaction created successfully
  */
-router.post('/', async (req: AuthRequest, res, next) => {
+router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { particularId, transactionType, transactionFlow, quantity, rate, percentage, total, description } = req.body;
 
@@ -213,7 +213,7 @@ router.post('/', async (req: AuthRequest, res, next) => {
  *       404:
  *         description: Transaction not found
  */
-router.get('/:id', async (req: AuthRequest, res, next) => {
+router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const transaction = await Transaction.findOne({
       _id: req.params.id,
@@ -269,7 +269,7 @@ router.get('/:id', async (req: AuthRequest, res, next) => {
  *       404:
  *         description: Transaction not found
  */
-router.put('/:id', async (req: AuthRequest, res, next) => {
+router.put('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const oldTransaction = await Transaction.findOne({
       _id: req.params.id,
@@ -354,7 +354,7 @@ router.put('/:id', async (req: AuthRequest, res, next) => {
  *       404:
  *         description: Transaction not found
  */
-router.delete('/:id', async (req: AuthRequest, res, next) => {
+router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const transaction = await Transaction.findOne({
       _id: req.params.id,

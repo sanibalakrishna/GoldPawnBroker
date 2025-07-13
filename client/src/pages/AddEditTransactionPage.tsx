@@ -35,7 +35,6 @@ const AddEditTransactionPage = () => {
 
   useEffect(() => {
     if (isEditing && transactionData) {
-      console.log('Setting form data for editing:', transactionData);
       const newFormData = {
         transactionType: transactionData.transactionType || 'cash',
         transactionFlow: transactionData.transactionFlow || 'incoming',
@@ -45,7 +44,6 @@ const AddEditTransactionPage = () => {
         percentage: transactionData.percentage?.toString() || '',
         total: transactionData.total?.toString() || ''
       };
-      console.log('New form data:', newFormData);
       setFormData(newFormData);
     }
   }, [isEditing, transactionData]);
@@ -56,10 +54,7 @@ const AddEditTransactionPage = () => {
     setFormData(prev => ({ ...prev, total }));
   }, [formData.transactionType, formData.quantity, formData.rate, formData.percentage]);
 
-  // Debug: Log form data changes
-  useEffect(() => {
-    console.log('Form data changed:', formData);
-  }, [formData]);
+
 
   const calculateTotal = () => {
     const quantity = parseFloat(formData.quantity) || 0;

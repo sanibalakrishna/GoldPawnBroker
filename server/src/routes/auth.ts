@@ -1,5 +1,5 @@
 // routes/auth.ts
-import express, { Router } from 'express';
+import express, { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import { IUser, User } from '../models/User';
 import { generateToken, generateRefreshToken } from '../utils/jwt';
@@ -40,7 +40,7 @@ const router:Router = express.Router();
  *       409:
  *         description: User already exists
  */
-router.post('/register', async (req, res, next) => {
+router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { username, email, password, role = 'user' } = req.body;
 
@@ -110,7 +110,7 @@ router.post('/register', async (req, res, next) => {
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', async (req, res, next) => {
+router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
 
@@ -160,7 +160,7 @@ router.post('/login', async (req, res, next) => {
  *       401:
  *         description: Unauthorized
  */
-router.get('/profile', async (req, res, next) => {
+router.get('/profile', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];

@@ -1,5 +1,5 @@
 // routes/dashboard.ts
-import express, { Router } from 'express';
+import express, { Router, Request, Response, NextFunction } from 'express';
 import { Particular } from '../models/Particular';
 import { Transaction } from '../models/Transaction';
 import { AuthRequest } from '../middleware/auth';
@@ -18,7 +18,7 @@ const router:Router = express.Router();
  *       200:
  *         description: Dashboard overview data
  */
-router.get('/overview', async (req: AuthRequest, res, next) => {
+router.get('/overview', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user._id;
 
@@ -101,7 +101,7 @@ router.get('/overview', async (req: AuthRequest, res, next) => {
  *       200:
  *         description: Particulars summary data
  */
-router.get('/particulars-summary', async (req: AuthRequest, res, next) => {
+router.get('/particulars-summary', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user._id;
 
@@ -152,7 +152,7 @@ router.get('/particulars-summary', async (req: AuthRequest, res, next) => {
  *       200:
  *         description: Analytics data
  */
-router.get('/analytics', async (req: AuthRequest, res, next) => {
+router.get('/analytics', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const userId = req.user._id;
     const { period = 'month' } = req.query;

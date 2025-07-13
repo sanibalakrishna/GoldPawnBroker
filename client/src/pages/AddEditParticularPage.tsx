@@ -84,7 +84,7 @@ const AddEditParticularPage = () => {
         backTo="/particulars"
         rightAction={{
           label: "Save",
-          onClick: handleSubmit,
+          onClick: () => handleSubmit(new Event('submit') as any),
           icon: <Save className="h-4 w-4" />
         }}
       />

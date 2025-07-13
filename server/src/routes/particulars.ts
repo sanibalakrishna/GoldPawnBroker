@@ -1,5 +1,5 @@
 // routes/particulars.ts
-import express, { Router } from 'express';
+import express, { Router, Request, Response, NextFunction } from 'express';
 import { Particular } from '../models/Particular';
 import { Transaction } from '../models/Transaction';
 import { AuthRequest } from '../middleware/auth';
@@ -34,7 +34,7 @@ const router:Router = express.Router();
  *       200:
  *         description: List of particulars
  */
-router.get('/', async (req: AuthRequest, res, next) => {
+router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { search, page = 1, limit = 10 } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
@@ -89,7 +89,7 @@ router.get('/', async (req: AuthRequest, res, next) => {
  *       404:
  *         description: Particular not found
  */
-router.get('/:id', async (req: AuthRequest, res, next) => {
+router.get('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const particular = await Particular.findOne({
       _id: req.params.id,
@@ -135,7 +135,7 @@ router.get('/:id', async (req: AuthRequest, res, next) => {
  *       201:
  *         description: Particular created successfully
  */
-router.post('/', async (req: AuthRequest, res, next) => {
+router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const particular = new Particular({
       ...req.body,
@@ -188,7 +188,7 @@ router.post('/', async (req: AuthRequest, res, next) => {
  *       404:
  *         description: Particular not found
  */
-router.put('/:id', async (req: AuthRequest, res, next) => {
+router.put('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const particular = await Particular.findOneAndUpdate(
       { _id: req.params.id, createdBy: req.user._id },
@@ -229,7 +229,7 @@ router.put('/:id', async (req: AuthRequest, res, next) => {
  *       404:
  *         description: Particular not found
  */
-router.delete('/:id', async (req: AuthRequest, res, next) => {
+router.delete('/:id', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const particular = await Particular.findOneAndDelete({
       _id: req.params.id,
