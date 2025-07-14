@@ -363,6 +363,11 @@ const ParticularDetailsPage = () => {
         description={`Are you sure you want to delete this transaction? This action cannot be undone.`}
         isLoading={deleting}
       />
+      
+      {/* Floating Action Button - only show on transactions tab */}
+      {activeTab === 'transactions' && (
+        <FloatingActionButton particularId={id} />
+      )}
     </div>
   );
 };

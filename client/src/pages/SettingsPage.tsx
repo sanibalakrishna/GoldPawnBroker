@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,23 +22,28 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
+import { useGetUserProfileQuery, useUpdateUserProfileMutation, useChangePasswordMutation } from '@/services/api';
 
 const SettingsPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+  // API hooks
+  const { data: userProfile, isLoading: profileLoading } = useGetUserProfileQuery();
+  const [updateProfile, { isLoading: updatingProfile }] = useUpdateUserProfileMutation();
+  const [changePassword, { isLoading: changingPassword }] = useChangePasswordMutation();
 
   // Form states
   const [profileData, setProfileData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+91 98765 43210',
-    address: '123 Main Street, City, State 12345',
-    businessName: 'Gold & Silver Pawn Broker',
-    businessAddress: '456 Business Ave, City, State 12345',
-    businessPhone: '+91 98765 43211',
-    gstNumber: 'GST123456789',
-    licenseNumber: 'LIC789456123'
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    businessName: '',
+    businessAddress: '',
+    businessPhone: '',
+    gstNumber: '',
+    licenseNumber: ''
   });
 
   const [preferences, setPreferences] = useState({
@@ -56,16 +61,44 @@ const SettingsPage = () => {
     confirmPassword: ''
   });
 
+  // Load user data when profile is fetched
+  useEffect(() => {
+    if (userProfile?.user) {
+      const user = userProfile.user;
+      setProfileData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: user.address || '',
+        businessName: user.businessName || '',
+        businessAddress: user.businessAddress || '',
+        businessPhone: user.businessPhone || '',
+        gstNumber: user.gstNumber || '',
+        licenseNumber: user.licenseNumber || ''
+      });
+      
+      setPreferences({
+        emailNotifications: user.emailNotifications ?? true,
+        smsNotifications: user.smsNotifications ?? false,
+        darkMode: user.darkMode ?? false,
+        autoBackup: user.autoBackup ?? true,
+        currency: user.currency || 'INR',
+        language: user.language || 'English'
+      });
+    }
+  }, [userProfile]);
+
   const handleProfileSave = async () => {
-    setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const updateData = {
+        ...profileData,
+        ...preferences
+      };
+      
+      await updateProfile(updateData).unwrap();
       toast.success('Profile updated successfully!');
-    } catch (error) {
-      toast.error('Failed to update profile');
-    } finally {
-      setIsLoading(false);
+    } catch (error: any) {
+      toast.error(error.data?.error || 'Failed to update profile');
     }
   };
 
@@ -75,16 +108,20 @@ const SettingsPage = () => {
       return;
     }
     
-    setIsLoading(true);
+    if (passwordData.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
+    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await changePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      }).unwrap();
       toast.success('Password changed successfully!');
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (error) {
-      toast.error('Failed to change password');
-    } finally {
-      setIsLoading(false);
+    } catch (error: any) {
+      toast.error(error.data?.error || 'Failed to change password');
     }
   };
 
@@ -205,8 +242,8 @@ const SettingsPage = () => {
                 />
               </div>
               
-              <Button onClick={handleProfileSave} disabled={isLoading} className="w-full">
-                {isLoading ? (
+              <Button onClick={handleProfileSave} disabled={updatingProfile || profileLoading} className="w-full">
+                {updatingProfile ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     <span>Saving...</span>
@@ -286,8 +323,15 @@ const SettingsPage = () => {
                 />
               </div>
               
-              <Button onClick={handlePasswordChange} disabled={isLoading} variant="outline" className="w-full">
-                Change Password
+              <Button onClick={handlePasswordChange} disabled={changingPassword} variant="outline" className="w-full">
+                {changingPassword ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Changing...</span>
+                  </div>
+                ) : (
+                  'Change Password'
+                )}
               </Button>
             </CardContent>
           </Card>

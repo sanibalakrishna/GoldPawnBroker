@@ -8,6 +8,119 @@ const router:Router= express.Router();
 
 /**
  * @swagger
+ * /api/transactions/search:
+ *   get:
+ *     summary: Search transactions across all particulars
+ *     tags: [Transactions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search term for transaction description
+ *       - in: query
+ *         name: transactionType
+ *         schema:
+ *           type: string
+ *           enum: [cash, metal]
+ *       - in: query
+ *         name: transactionFlow
+ *         schema:
+ *           type: string
+ *           enum: [incoming, outgoing]
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       200:
+ *         description: List of transactions matching search criteria
+ */
+router.get('/search', async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { 
+      search, 
+      transactionType, 
+      transactionFlow, 
+      startDate, 
+      endDate, 
+      page = 1, 
+      limit = 10 
+    } = req.query;
+    
+    const skip = (Number(page) - 1) * Number(limit);
+
+    let query: any = { createdBy: req.user._id };
+
+    // Add search filter
+    if (search) {
+      query.description = { $regex: search, $options: 'i' };
+    }
+
+    // Add transaction type filter
+    if (transactionType) {
+      query.transactionType = transactionType;
+    }
+
+    // Add transaction flow filter
+    if (transactionFlow) {
+      query.transactionFlow = transactionFlow;
+    }
+
+    // Add date range filter
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) {
+        query.createdAt.$gte = new Date(startDate as string);
+      }
+      if (endDate) {
+        query.createdAt.$lte = new Date(endDate as string);
+      }
+    }
+
+    const transactions = await Transaction.find(query)
+      .skip(skip)
+      .limit(Number(limit))
+      .sort({ createdAt: -1 })
+      .populate('particularId', 'name contactNumber')
+      .populate('createdBy', 'username');
+
+    const total = await Transaction.countDocuments(query);
+
+    return res.json({
+      transactions,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages: Math.ceil(total / Number(limit))
+      }
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+/**
+ * @swagger
  * /api/transactions/particular/{particularId}:
  *   get:
  *     summary: Get all transactions for a particular

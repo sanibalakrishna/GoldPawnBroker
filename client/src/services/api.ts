@@ -17,7 +17,7 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Particular', 'Transaction'],
+  tagTypes: ['Particular', 'Transaction', 'User'],
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (credentials) => ({
@@ -91,6 +91,39 @@ export const api = createApi({
       }),
       invalidatesTags: ['Transaction'],
     }),
+    // User profile management
+    getUserProfile: builder.query({
+      query: () => '/auth/profile',
+      providesTags: ['User'],
+    }),
+    updateUserProfile: builder.mutation({
+      query: (data) => ({
+        url: '/auth/profile',
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['User'],
+    }),
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: '/auth/change-password',
+        method: 'PUT',
+        body: data,
+      }),
+    }),
+    // Transaction search
+    searchTransactions: builder.query({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            searchParams.append(key, value.toString());
+          }
+        });
+        return `/transactions/search?${searchParams.toString()}`;
+      },
+      providesTags: ['Transaction'],
+    }),
   }),
 });
 
@@ -107,4 +140,8 @@ export const {
   useCreateTransactionMutation,
   useUpdateTransactionMutation,
   useDeleteTransactionMutation,
+  useGetUserProfileQuery,
+  useUpdateUserProfileMutation,
+  useChangePasswordMutation,
+  useSearchTransactionsQuery,
 } = api;

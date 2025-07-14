@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGetTransactionsQuery, useDeleteTransactionMutation } from '@/services/api';
+import { useSearchTransactionsQuery, useDeleteTransactionMutation } from '@/services/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +27,14 @@ const TransactionsPage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   
-  const { data: transactionsData, isLoading } = useGetTransactionsQuery(undefined);
+  // Build search parameters
+  const searchParams = {
+    search: searchTerm || undefined,
+    transactionType: transactionType === 'all' ? undefined : transactionType,
+    transactionFlow: transactionFlow === 'all' ? undefined : transactionFlow,
+  };
+  
+  const { data: transactionsData, isLoading } = useSearchTransactionsQuery(searchParams);
   const [deleteTransaction, { isLoading: deleting }] = useDeleteTransactionMutation();
   const navigate = useNavigate();
   
@@ -50,17 +57,6 @@ const TransactionsPage = () => {
     setSelectedTransaction(transaction);
     setDeleteDialogOpen(true);
   };
-
-  // Filter transactions based on search and filters
-  const filteredTransactions = transactions.filter((transaction: any) => {
-    const matchesSearch = !searchTerm || 
-      transaction.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      transaction.particular?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = transactionType === 'all' || transaction.transactionType === transactionType;
-    const matchesFlow = transactionFlow === 'all' || transaction.transactionFlow === transactionFlow;
-    
-    return matchesSearch && matchesType && matchesFlow;
-  });
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -139,7 +135,7 @@ const TransactionsPage = () => {
                 <span>All Transactions</span>
               </CardTitle>
               <CardDescription>
-                Showing {filteredTransactions.length} of {transactions.length} transactions
+                Showing {transactions.length} transactions
               </CardDescription>
             </div>
           </div>
@@ -151,7 +147,7 @@ const TransactionsPage = () => {
             <>
               {/* Mobile List View */}
               <div className="space-y-3 sm:hidden">
-                {filteredTransactions.map((transaction: any) => (
+                {transactions.map((transaction: any) => (
                   <div 
                     key={transaction._id}
                     className="bg-muted/30 border rounded-xl p-4 space-y-3"
@@ -209,7 +205,7 @@ const TransactionsPage = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredTransactions.map((transaction: any) => (
+                    {transactions.map((transaction: any) => (
                       <TableRow key={transaction._id} className="hover:bg-muted/30">
                         <TableCell className="font-medium">{transaction.description}</TableCell>
                         <TableCell>{transaction.particular?.name}</TableCell>
@@ -254,7 +250,7 @@ const TransactionsPage = () => {
             </>
           )}
           
-          {filteredTransactions.length === 0 && !isLoading && (
+          {transactions.length === 0 && !isLoading && (
             <EmptyState
               icon={<IndianRupee />}
               title="No transactions found"
@@ -274,12 +270,12 @@ const TransactionsPage = () => {
 
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
+        isOpen={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
         onConfirm={handleDeleteTransaction}
         title="Delete Transaction"
         description={`Are you sure you want to delete this transaction? This action cannot be undone.`}
-        loading={deleting}
+        isLoading={deleting}
       />
     </div>
   );

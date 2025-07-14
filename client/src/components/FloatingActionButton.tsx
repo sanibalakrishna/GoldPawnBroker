@@ -20,7 +20,7 @@ const FloatingActionButton = ({ particularId }: FloatingActionButtonProps) => {
     if (particularId) {
       navigate(`/particulars/${particularId}/transactions/new`);
     } else {
-      navigate('/transactions/new');
+      navigate('/select-particular');
     }
     setIsOpen(false);
   };

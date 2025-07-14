@@ -7,6 +7,7 @@ import ParticularsPage from './pages/ParticularsPage';
 import ParticularDetailsPage from './pages/ParticularDetailsPage';
 import AddEditParticularPage from './pages/AddEditParticularPage';
 import AddEditTransactionPage from './pages/AddEditTransactionPage';
+import SelectParticularPage from './pages/SelectParticularPage';
 import TransactionsPage from './pages/TransactionsPage';
 import SettingsPage from './pages/SettingsPage';
 
@@ -75,6 +76,15 @@ function App() {
           isAuth ? (
             <Layout>
               <AddEditTransactionPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/select-particular" element={
+          isAuth ? (
+            <Layout>
+              <SelectParticularPage />
             </Layout>
           ) : (
             <Navigate to="/login" />

@@ -1,5 +1,5 @@
 // server.ts
-import express, { Application, Request, Response } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoose, { Error } from 'mongoose';
@@ -32,12 +32,12 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gold_p
 async function connectDB() {
   try {
     await mongoose.connect(MONGODB_URI, {
-      maxPoolSize: 10 as any,
+      maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       retryWrites: true,
       w: 'majority'
-    });
+    } as any);
     console.log('Connected to MongoDB');
   } catch (err) {
     console.error('MongoDB connection error:', err);
