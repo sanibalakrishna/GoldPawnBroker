@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
-import { Save, DollarSign } from 'lucide-react';
+import { Save, IndianRupee } from 'lucide-react';
 
 const AddEditTransactionPage = () => {
   const { id, particularId } = useParams();
@@ -129,11 +129,11 @@ const AddEditTransactionPage = () => {
   if (isEditing && (loadingTransaction || !transactionData)) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header 
+       {/*<Header 
           title="Edit Transaction"
           showBackButton={true}
           backTo={`/particulars/${particularId}`}
-        />
+        />*/}
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="text-center py-8">Loading transaction details...</div>
         </div>
@@ -143,7 +143,7 @@ const AddEditTransactionPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
+      {/*<Header 
         title={isEditing ? "Edit Transaction" : "Add New Transaction"}
         showBackButton={true}
         backTo={`/particulars/${particularId}`}
@@ -152,13 +152,13 @@ const AddEditTransactionPage = () => {
           onClick: () => handleSubmit(new Event('submit') as any),
           icon: <Save className="h-4 w-4" />
         }}
-      />
+      />*/}
 
       <div className="max-w-2xl mx-auto px-4 py-4 sm:py-8">
         <Card>
           <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl flex items-center">
-              <DollarSign className="h-5 w-5 mr-2" />
+              <IndianRupee className="h-5 w-5 mr-2" />
               {isEditing ? 'Edit Transaction' : 'New Transaction'}
             </CardTitle>
             <CardDescription className="hidden sm:block">

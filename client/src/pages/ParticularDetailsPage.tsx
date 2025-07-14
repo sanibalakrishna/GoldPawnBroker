@@ -7,10 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, DollarSign, TrendingUp, TrendingDown, User, Plus, Edit, Trash2, MoreHorizontal } from 'lucide-react';
+import { Search, IndianRupee, TrendingUp, TrendingDown, User, Plus, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog';
+import FloatingActionButton from '@/components/FloatingActionButton';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,7 @@ const ParticularDetailsPage = () => {
   const [transactionFlow, setTransactionFlow] = useState('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState('overview');
   
   const { data: transactionsData, isLoading } = useGetTransactionsQuery(id!);
   const {data:particularData,isLoading:particularLoading} = useGetParticularQuery(id!);
@@ -64,7 +66,7 @@ const ParticularDetailsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
+      {/*<Header 
         title={particular?.name || 'Particular Details'}
         showBackButton={true}
         backTo="/particulars"
@@ -73,10 +75,10 @@ const ParticularDetailsPage = () => {
           onClick: () => navigate(`/particulars/${id}/transactions/new`),
           icon: <Plus className="h-4 w-4" />
         }}
-      />
+      />*/}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <Tabs defaultValue="overview" className="space-y-4 sm:space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
@@ -106,7 +108,7 @@ const ParticularDetailsPage = () => {
               <Card className="p-3 sm:p-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs sm:text-sm font-medium text-gray-600">Assets</span>
-                  <DollarSign className="h-4 w-4 text-blue-600" />
+                  <IndianRupee className="h-4 w-4 text-blue-600" />
                 </div>
                 <div className="text-lg sm:text-2xl font-bold">₹{particular?.totalAssets?.toLocaleString() || '0'}</div>
                 <p className="text-xs text-muted-foreground hidden sm:block">Metal assets value</p>

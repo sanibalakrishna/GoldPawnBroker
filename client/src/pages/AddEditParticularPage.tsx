@@ -64,11 +64,11 @@ const AddEditParticularPage = () => {
   if (isEditing && loadingParticular) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header 
+        {/*<Header 
           title="Edit Particular"
           showBackButton={true}
           backTo="/particulars"
-        />
+        />*/}
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="text-center py-8">Loading particular details...</div>
         </div>
@@ -78,7 +78,7 @@ const AddEditParticularPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
+      {/*<Header 
         title={isEditing ? "Edit Particular" : "Add New Particular"}
         showBackButton={true}
         backTo="/particulars"
@@ -87,7 +87,7 @@ const AddEditParticularPage = () => {
           onClick: () => handleSubmit(new Event('submit') as any),
           icon: <Save className="h-4 w-4" />
         }}
-      />
+      />*/}
 
       <div className="max-w-2xl mx-auto px-4 py-4 sm:py-8">
         <Card>
