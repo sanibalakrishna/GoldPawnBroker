@@ -6,19 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
 import { 
   User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Building, 
   Shield, 
   Bell, 
   Palette, 
-  Save,
   Eye,
-  EyeOff
+  EyeOff,
+  Save
 } from 'lucide-react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
@@ -29,7 +24,7 @@ const SettingsPage = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
 
   // API hooks
-  const { data: userProfile, isLoading: profileLoading } = useGetUserProfileQuery();
+  const { data: userProfile, isLoading: profileLoading } = useGetUserProfileQuery(undefined);
   const [updateProfile, { isLoading: updatingProfile }] = useUpdateUserProfileMutation();
   const [changePassword, { isLoading: changingPassword }] = useChangePasswordMutation();
 

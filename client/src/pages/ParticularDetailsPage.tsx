@@ -7,9 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, IndianRupee, TrendingUp, TrendingDown, User, Plus, Edit, Trash2, MoreHorizontal } from 'lucide-react';
+import { Search, IndianRupee, TrendingUp, TrendingDown, User, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
-import Header from '@/components/Header';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog';
 import FloatingActionButton from '@/components/FloatingActionButton';
 import {
@@ -356,12 +355,12 @@ const ParticularDetailsPage = () => {
       </div>
 
       <DeleteConfirmDialog
-        isOpen={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteTransaction}
         title="Delete Transaction"
         description={`Are you sure you want to delete this transaction? This action cannot be undone.`}
-        isLoading={deleting}
+        loading={deleting}
       />
       
       {/* Floating Action Button - only show on transactions tab */}

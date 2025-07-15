@@ -12,24 +12,24 @@ import {
 import { Trash2 } from "lucide-react";
 
 interface DeleteConfirmDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   title: string;
   description: string;
-  isLoading?: boolean;
+  loading?: boolean;
 }
 
 const DeleteConfirmDialog = ({
-  isOpen,
-  onClose,
+  open,
+  onOpenChange,
   onConfirm,
   title,
   description,
-  isLoading = false
+  loading = false
 }: DeleteConfirmDialogProps) => {
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center">
@@ -41,13 +41,13 @@ const DeleteConfirmDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            disabled={isLoading}
+            disabled={loading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isLoading ? 'Deleting...' : 'Delete'}
+            {loading ? 'Deleting...' : 'Delete'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

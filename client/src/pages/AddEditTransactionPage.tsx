@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import Header from '@/components/Header';
-import { Save, IndianRupee } from 'lucide-react';
+import { IndianRupee } from 'lucide-react';
 
 const AddEditTransactionPage = () => {
   const { id, particularId } = useParams();

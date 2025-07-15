@@ -7,8 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import Header from '@/components/Header';
-import { Save, User } from 'lucide-react';
+import { User } from 'lucide-react';
 
 const AddEditParticularPage = () => {
   const { id } = useParams();

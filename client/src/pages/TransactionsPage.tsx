@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSearchTransactionsQuery, useDeleteTransactionMutation } from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, IndianRupee, TrendingUp, TrendingDown, Edit, Trash2, MoreHorizontal, Calendar, User } from 'lucide-react';
+import { Search, IndianRupee, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
 import DeleteConfirmDialog from '@/components/DeleteConfirmDialog';
@@ -208,7 +208,7 @@ const TransactionsPage = () => {
                     {transactions.map((transaction: any) => (
                       <TableRow key={transaction._id} className="hover:bg-muted/30">
                         <TableCell className="font-medium">{transaction.description}</TableCell>
-                        <TableCell>{transaction.particular?.name}</TableCell>
+                        <TableCell>{transaction.particularId?.name}</TableCell>
                         <TableCell className="capitalize">{transaction.transactionType}</TableCell>
                         <TableCell className="capitalize">{transaction.transactionFlow}</TableCell>
                         <TableCell className={transaction.transactionFlow === 'incoming' ? 'text-green-600' : 'text-red-600'}>
@@ -270,12 +270,12 @@ const TransactionsPage = () => {
 
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmDialog
-        isOpen={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
+        open={deleteDialogOpen}
+        onOpenChange={() => setDeleteDialogOpen(false)}
         onConfirm={handleDeleteTransaction}
         title="Delete Transaction"
         description={`Are you sure you want to delete this transaction? This action cannot be undone.`}
-        isLoading={deleting}
+        loading={deleting}
       />
     </div>
   );

@@ -21,7 +21,7 @@ import {
 
 const ParticularsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, _setCurrentPage] = useState(1);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedParticular, setSelectedParticular] = useState<any>(null);
   
