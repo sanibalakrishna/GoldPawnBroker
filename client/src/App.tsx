@@ -11,11 +11,22 @@ import SelectParticularPage from './pages/SelectParticularPage';
 import TransactionsPage from './pages/TransactionsPage';
 import SettingsPage from './pages/SettingsPage';
 
+import { useState, useEffect } from 'react';
+
 function App() {
-  const isAuth = Boolean(localStorage.getItem('token'));
+  const [isAuth, setIsAuth] = useState(Boolean(localStorage.getItem('token')));
+
+  useEffect(() => {
+    const onStorage = () => setIsAuth(Boolean(localStorage.getItem('token')));
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+
 
   return (
     <>
+ 
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={

@@ -20,6 +20,7 @@ const LoginPage = () => {
     try {
       const result = await login({ email, password }).unwrap();
       localStorage.setItem('token', result.token);
+      window.dispatchEvent(new Event('storage'));
       toast.success('Login successful!');
       navigate('/');
     } catch (error: any) {

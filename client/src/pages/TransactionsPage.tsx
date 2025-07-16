@@ -211,10 +211,10 @@ const TransactionsPage = () => {
                         <TableCell>{transaction.particularId?.name}</TableCell>
                         <TableCell className="capitalize">{transaction.transactionType}</TableCell>
                         <TableCell className="capitalize">{transaction.transactionFlow}</TableCell>
-                        <TableCell className={transaction.transactionFlow === 'incoming' ? 'text-green-600' : 'text-red-600'}>
-                          ₹{transaction.amount?.toLocaleString()}
+                        <TableCell className={transaction.transactionFlow == 'incoming' ? 'text-green-600' : 'text-red-600'}>
+                          ₹{transaction.total?.toLocaleString()}
                         </TableCell>
-                        <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
+                        <TableCell>{new Date(transaction.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end space-x-2">
                             <Button
