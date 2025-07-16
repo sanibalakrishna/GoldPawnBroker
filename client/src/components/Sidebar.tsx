@@ -9,6 +9,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import Cookies from 'js-cookie';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -48,9 +49,10 @@ const Sidebar = ({ isOpen, onToggle, isCollapsed, setIsCollapsed }: SidebarProps
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    Cookies.remove('token');
+    window.location.href = '/login';
   };
 
   const isActive = (href: string) => {

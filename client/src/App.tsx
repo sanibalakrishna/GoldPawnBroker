@@ -12,12 +12,13 @@ import TransactionsPage from './pages/TransactionsPage';
 import SettingsPage from './pages/SettingsPage';
 
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 function App() {
-  const [isAuth, setIsAuth] = useState(Boolean(localStorage.getItem('token')));
+  const [isAuth, setIsAuth] = useState(Boolean(Cookies.get('token')));
 
   useEffect(() => {
-    const onStorage = () => setIsAuth(Boolean(localStorage.getItem('token')));
+    const onStorage = () => setIsAuth(Boolean(Cookies.get('token')));
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
   }, []);

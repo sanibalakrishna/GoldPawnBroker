@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import Cookies from 'js-cookie';
 
 // Environment-based API URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || (
@@ -8,28 +9,40 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || (
     : 'http://localhost:3000/api'
 );
 
-// Custom baseQuery with auto-logout on 401
+// Custom baseQuery with refresh logic
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   prepareHeaders: (headers) => {
-    const token = localStorage.getItem('token');
+    const token = Cookies.get('token');
     if (token) headers.set('Authorization', `Bearer ${token}`);
     return headers;
   },
 });
 
-const baseQueryWithLogout: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
-  const result = await baseQuery(args, api, extraOptions);
+const baseQueryWithRefresh: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
+  let result = await baseQuery(args, api, extraOptions);
   if (result.error && result.error.status === 401) {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
+    // Try to refresh the token
+    const refreshResult = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+      method: 'POST',
+      credentials: 'include', // send cookies
+    });
+    const data = await refreshResult.json();
+    if (data.token) {
+      Cookies.set('token', data.token);
+      // Retry the original query with the new token
+      result = await baseQuery(args, api, extraOptions);
+    } else {
+      Cookies.remove('token');
+      window.location.href = '/login';
+    }
   }
   return result;
 };
 
 export const api = createApi({
   reducerPath: 'api',
-  baseQuery: baseQueryWithLogout, // Use the custom baseQuery
+  baseQuery: baseQueryWithRefresh, // Use the custom baseQuery
   tagTypes: ['Particular', 'Transaction', 'User'],
   endpoints: (builder) => ({
     login: builder.mutation({

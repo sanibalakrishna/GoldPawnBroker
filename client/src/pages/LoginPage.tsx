@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { IndianRupee, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import Cookies from 'js-cookie';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -19,7 +20,7 @@ const LoginPage = () => {
     
     try {
       const result = await login({ email, password }).unwrap();
-      localStorage.setItem('token', result.token);
+      Cookies.set('token', result.token);
       window.dispatchEvent(new Event('storage'));
       toast.success('Login successful!');
       navigate('/');

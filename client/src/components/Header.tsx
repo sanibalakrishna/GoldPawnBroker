@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, LogOut } from 'lucide-react';
+import Cookies from 'js-cookie';
 
 interface HeaderProps {
   title: string;
@@ -23,9 +24,10 @@ const Header = ({
 }: HeaderProps) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    Cookies.remove('token');
+    window.location.href = '/login';
   };
 
   return (

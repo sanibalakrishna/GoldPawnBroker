@@ -13,6 +13,7 @@ import { authenticateToken } from './middleware/auth';
 import { errorHandler } from './middleware/errorHandler';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // MongoDB Connection with proper configuration
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gold_pawn_broker';

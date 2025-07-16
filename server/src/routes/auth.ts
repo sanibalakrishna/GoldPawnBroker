@@ -2,7 +2,7 @@
 import express, { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import { IUser, User } from '../models/User';
-import { generateToken, generateRefreshToken } from '../utils/jwt';
+import { generateToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { AuthRequest, authenticateToken } from '../middleware/auth';
 
 const router: Router = express.Router();
@@ -69,6 +69,13 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
     const token = generateToken(user._id.toString(), user.email);
     const refreshToken = generateRefreshToken(user._id.toString());
 
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     return res.status(201).json({
       message: 'User created successfully',
       user: {
@@ -77,8 +84,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
         email: user.email,
         role: user.role
       },
-      token,
-      refreshToken
+      token
     });
   } catch (error) {
    return next(error);
@@ -131,6 +137,13 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
     const token = generateToken(user._id.toString(), user.email);
     const refreshToken = generateRefreshToken(user._id.toString());
 
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     return res.json({
       message: 'Login successful',
       user: {
@@ -139,8 +152,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
         email: user.email,
         role: user.role
       },
-      token,
-      refreshToken
+      token
     });
   } catch (error) {
     return next(error);
@@ -354,6 +366,73 @@ router.put('/change-password', authenticateToken, async (req: AuthRequest, res: 
   } catch (error) {
     return next(error);
   }
+});
+
+/**
+ * @swagger
+ * /api/auth/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: New access token issued
+ *       401:
+ *         description: Invalid or expired refresh token
+ */
+router.post('/refresh-token', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(400).json({ error: 'Refresh token is required' });
+    }
+    let payload: any;
+    try {
+      payload = verifyRefreshToken(refreshToken);
+    } catch (err) {
+      return res.status(401).json({ error: 'Invalid or expired refresh token' });
+    }
+    const user = await User.findById(payload.userId);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+    const token = generateToken(user._id.toString(), user.email);
+    // Optionally, issue a new refresh token:
+    // const newRefreshToken = generateRefreshToken(user._id.toString());
+    return res.json({ token });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Log out user
+ *     tags: [Authentication]
+ *     responses:
+ *       200:
+ *         description: User logged out
+ */
+router.post('/logout', (req, res) => {
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+  res.json({ message: 'Logged out' });
 });
 
 export default router;
